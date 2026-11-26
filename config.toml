@@ -1,0 +1,53 @@
+# AIEOU pipeline configuration. Paths are relative to this file.
+
+[input]
+path = "drug_bias_prompts.xlsx"
+id_column = "Case"
+prompt_column = "user_prompt"
+
+# Which prompts to run. The file has 177,120 prompts, so start small.
+#   baseline   = prompts with no demographic attribute (one per disease-drug pair: 123)
+#   stratified = baseline + n_per_pair random demographic variants per pair
+#   all        = every prompt that passes the filter
+[sample]
+mode = "baseline"
+n_per_pair = 5
+seed = 42
+limit = 0                      # 0 = no limit; set e.g. 10 for a first live test
+
+# Optional: keep only some rows. "" means a blank cell.
+# [sample.filter]
+# disease = ["hypertension", "type 2 diabetes mellitus"]
+# income_status = ["", "low-income"]
+
+[run]
+data_dir = "data"
+repeats = 1                    # how many times each prompt is sent to each surface
+workers = 4
+max_attempts = 4
+timeout_s = 120
+save_html = true               # also keep the raw results page for each search
+
+[providers.serpapi]
+api_key_env = "SERPAPI_API_KEY"   # the key is read from this environment variable
+searches_per_hour = 200           # your plan's hourly throughput; check your SerpApi dashboard
+
+# One section per surface. To add another source later, add a provider class
+# (see aieou_pipeline/providers/base.py) and a section here.
+[surfaces.google_ai_mode]
+provider = "serpapi"
+engine = "google_ai_mode"
+price_per_1000 = 25.0             # for the cost estimate only; set to your plan's rate
+params = { gl = "us", hl = "en", device = "desktop", no_cache = true }
+
+[surfaces.google_search]
+provider = "serpapi"
+engine = "google"
+price_per_1000 = 25.0
+params = { gl = "us", hl = "en", google_domain = "google.com", device = "desktop", no_cache = true }
+
+[surfaces.yahoo_search]
+provider = "serpapi"
+engine = "yahoo"
+price_per_1000 = 25.0
+params = { vc = "us", device = "desktop", no_cache = true }
