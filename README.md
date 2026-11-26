@@ -1,4 +1,4 @@
-# GEO pipeline
+# AIEOU pipeline
 
 Sends each prompt to several search surfaces (Google AI Mode, Google Search,
 Yahoo Search), keeps every raw response, and produces tidy tables for analysis.
